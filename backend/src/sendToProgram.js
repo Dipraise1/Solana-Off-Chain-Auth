@@ -205,9 +205,13 @@ const sendSignedMessageToProgram = async (signedMessageData) => {
 // Function to execute all pending messages
 const executeAllPendingMessages = async () => {
   try {
+    // Use axios instead of fetch for better compatibility in Node.js environment
+    const axios = require('axios');
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    
     // Fetch pending messages from the backend API
-    const response = await fetch('http://localhost:3001/api/pending-messages');
-    const pendingMessages = await response.json();
+    const response = await axios.get(`${backendUrl}/api/pending-messages`);
+    const pendingMessages = response.data;
     
     console.log(`Found ${pendingMessages.length} pending messages to execute`);
     
@@ -220,14 +224,13 @@ const executeAllPendingMessages = async () => {
       
       if (result.success) {
         // Mark the message as executed in the backend
-        const markResponse = await fetch(`http://localhost:3001/api/mark-executed/${message._id}`, {
-          method: 'POST',
+        const markResponse = await axios.post(`${backendUrl}/api/mark-executed/${message._id}`, {}, {
           headers: {
             'Content-Type': 'application/json',
           },
         });
         
-        if (markResponse.ok) {
+        if (markResponse.status === 200) {
           console.log(`Message ${message._id} marked as executed`);
         } else {
           console.error(`Failed to mark message ${message._id} as executed`);
@@ -256,4 +259,6 @@ if (require.main === module) {
 module.exports = {
   sendSignedMessageToProgram,
   executeAllPendingMessages,
+  ensureNonceAccount,
+  loadAdminKeypair
 }; 

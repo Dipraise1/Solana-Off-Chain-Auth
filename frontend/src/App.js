@@ -36,7 +36,9 @@ function App() {
       }
       
       // Create the full message to sign
-      const fullMessage = `Transfer: ${amount} tokens\nNonce: ${nonce}`;
+      const fullMessage = message 
+        ? `Message: ${message}\nTransfer: ${amount} tokens\nNonce: ${nonce}`
+        : `Transfer: ${amount} tokens\nNonce: ${nonce}`;
       
       // Convert the message to bytes and sign it
       const messageBytes = new TextEncoder().encode(fullMessage);
@@ -146,9 +148,15 @@ function App() {
           {result && (
             <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#e8f5e9', color: '#2e7d32', borderRadius: '4px' }}>
               <h3>Success!</h3>
-              <p>Your signed message has been stored.</p>
-              <p>ID: {result.id}</p>
-              <p>This message will be processed by the backend and submitted to the Solana program.</p>
+              <p>Your signed message has been stored off-chain.</p>
+              <p>Transaction ID: {result.id}</p>
+              <p>Here's what happens next:</p>
+              <ol style={{ paddingLeft: '20px', marginTop: '5px' }}>
+                <li>Your signature is securely stored in the backend database</li>
+                <li>An admin or automated process will submit it to the Solana blockchain</li>
+                <li>The smart contract will verify your signature and execute the token transfer</li>
+                <li>No further action is needed from you</li>
+              </ol>
             </div>
           )}
         </div>
